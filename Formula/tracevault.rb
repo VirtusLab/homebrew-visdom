@@ -1,28 +1,28 @@
 class Tracevault < Formula
   desc "CLI tool for AI code tracing and attribution"
   homepage "https://github.com/VirtusLab/visdom-ai-tracing-cli"
-  version "0.29.7"
+  version "0.29.8"
   license :cannot_represent
 
   on_macos do
     on_arm do
-      url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/v0.29.7/tracevault-v0.29.7-aarch64-apple-darwin.tar.gz"
-      sha256 "3346a8711cf00be57498508fddd3462bdce14cf666a15246acd2a3eb95e56e73"
+      url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/v0.29.8/tracevault-v0.29.8-aarch64-apple-darwin.tar.gz"
+      sha256 "bb9dec198180947936c9502dbe4bd4764a1de4dd90dc8e256b8167a7d080213c"
     end
     on_intel do
-      url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/v0.29.7/tracevault-v0.29.7-x86_64-apple-darwin.tar.gz"
-      sha256 "ed12b2b64143e49a781d3375a2f2776b51105436822745288b3f3f7ff56f8e8f"
+      url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/v0.29.8/tracevault-v0.29.8-x86_64-apple-darwin.tar.gz"
+      sha256 "74d43ca423c763192f498db99ef85ed7a8d35397b68b5361a8c5c5557f95a4e9"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/v0.29.7/tracevault-v0.29.7-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "abf6bc67cb4d81eda5e50a563be6059f6ad61b94f01907c63d927144cdb5ae5f"
+      url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/v0.29.8/tracevault-v0.29.8-aarch64-unknown-linux-gnu.tar.gz"
+      sha256 "2680fd35b064c504b0f03824a3b3071eb98be3f49c209b2fe32504c0499b4a2e"
     end
     on_intel do
-      url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/v0.29.7/tracevault-v0.29.7-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "3d3f4a02db76790b4bca482d64454d8d20e4dcd3ecbfd07422b40f7fd4dd579c"
+      url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/v0.29.8/tracevault-v0.29.8-x86_64-unknown-linux-gnu.tar.gz"
+      sha256 "8a0a0bb19c77eee2e882a7f9c6592353109859458a8b69b771944c4687a6efcd"
     end
   end
 
