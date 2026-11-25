@@ -1,0 +1,48 @@
+name: Test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  generator:
+    name: Formula generator
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: scripts/test-update-formulae.sh
+
+  install:
+    name: Install on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Put Homebrew on the PATH (Linux)
+        if: runner.os == 'Linux'
+        run: echo "/home/linuxbrew/.linuxbrew/bin" >> "$GITHUB_PATH"
+
+      # The checked-out commit as a tap of its own, so what is installed is this
+      # commit's formulae and not the published ones.
+      - name: Tap this checkout
+        run: |
+          git switch -c tap-under-test
+          brew tap virtuslab/under-test "$GITHUB_WORKSPACE"
+
+      - name: Install and test both formulae
+        run: |
+          for formula in visdom tracevault; do
+            brew install "virtuslab/under-test/$formula"
+            brew test "virtuslab/under-test/$formula"
+          done
