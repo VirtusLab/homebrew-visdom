@@ -10,65 +10,35 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    env:
+      # The payload reaches the shell only as environment variables, never as
+      # text of the script.
+      TAG: ${{ github.event.client_payload.tag }}
+      VERSION: ${{ github.event.client_payload.version }}
+      VISDOM_VERSION: ${{ github.event.client_payload.visdom_version }}
+      SHA_AARCH64_DARWIN: ${{ github.event.client_payload.sha256_aarch64_apple_darwin }}
+      SHA_X86_64_DARWIN: ${{ github.event.client_payload.sha256_x86_64_apple_darwin }}
+      SHA_X86_64_LINUX: ${{ github.event.client_payload.sha256_x86_64_unknown_linux_gnu }}
+      SHA_AARCH64_LINUX: ${{ github.event.client_payload.sha256_aarch64_unknown_linux_gnu }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Update formula
-        run: |
-          VERSION="${{ github.event.client_payload.version }}"
-          TAG="${{ github.event.client_payload.tag }}"
-          SHA_AARCH64_DARWIN="${{ github.event.client_payload.sha256_aarch64_apple_darwin }}"
-          SHA_X86_64_DARWIN="${{ github.event.client_payload.sha256_x86_64_apple_darwin }}"
-          SHA_X86_64_LINUX="${{ github.event.client_payload.sha256_x86_64_unknown_linux_gnu }}"
-          SHA_AARCH64_LINUX="${{ github.event.client_payload.sha256_aarch64_unknown_linux_gnu }}"
-
-          cat > Formula/tracevault.rb << FORMULA
-          class Tracevault < Formula
-            desc "CLI tool for AI code tracing and attribution"
-            homepage "https://github.com/VirtusLab/visdom-ai-tracing-cli"
-            version "${VERSION}"
-            license :cannot_represent
-
-            on_macos do
-              on_arm do
-                url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/${TAG}/tracevault-${TAG}-aarch64-apple-darwin.tar.gz"
-                sha256 "${SHA_AARCH64_DARWIN}"
-              end
-              on_intel do
-                url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/${TAG}/tracevault-${TAG}-x86_64-apple-darwin.tar.gz"
-                sha256 "${SHA_X86_64_DARWIN}"
-              end
-            end
-
-            on_linux do
-              on_arm do
-                url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/${TAG}/tracevault-${TAG}-aarch64-unknown-linux-gnu.tar.gz"
-                sha256 "${SHA_AARCH64_LINUX}"
-              end
-              on_intel do
-                url "https://github.com/VirtusLab/visdom-ai-tracing-cli/releases/download/${TAG}/tracevault-${TAG}-x86_64-unknown-linux-gnu.tar.gz"
-                sha256 "${SHA_X86_64_LINUX}"
-              end
-            end
-
-            def install
-              bin.install "tracevault"
-            end
-
-            test do
-              assert_match version.to_s, shell_output("#{bin}/tracevault --version")
-            end
-          end
-          FORMULA
+      - name: Update formulae
+        run: scripts/update-formulae.sh
 
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add Formula/tracevault.rb
+          git add Formula
           if git diff --cached --quiet; then
-            echo "Formula already at ${{ github.event.client_payload.version }}; nothing to commit."
+            echo "Formulae already at ${VERSION}; nothing to commit."
             exit 0
           fi
-          git commit -m "chore: update tracevault to ${{ github.event.client_payload.version }}"
+          if [ -n "$VISDOM_VERSION" ]; then
+            message="chore: update visdom to ${VISDOM_VERSION}, tracevault to ${VERSION}"
+          else
+            message="chore: update tracevault to ${VERSION}"
+          fi
+          git commit -m "$message"
           git push
